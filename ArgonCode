@@ -1,0 +1,61 @@
+#include "Adafruit_DHT.h"
+
+
+#define DHTPIN 7
+#define DHTTYPE DHT11        // DHT 11 
+
+
+//DHT Setup 
+DHT dht(DHTPIN, DHTTYPE);
+
+// Setup function
+void setup() 
+{
+
+    Serial.begin(9600); 
+    Serial.println("DHTxx test!");
+
+    dht.begin();
+
+    pinMode(7, INPUT);
+
+
+    // Converting temperature values to String to send it to the Particle.variable
+    String t2 = "placeholder";
+    // Initialising the Particle.variable with test value.
+    Particle.variable("roomTemp", "testing");
+}
+
+// Main loop
+void loop() 
+{
+    
+    // Grab temperature value from sensor & convert it to string.
+    float t = dht.getTempCelcius();
+    String t2 = String(t);
+
+    // Check if sensor value is not 0 (troubleshooting)
+    if (t > 0)
+    {
+        Particle.publish("temperature", t2, PRIVATE);
+
+    }
+    
+    // Update particle.variable with temperature sensor data.
+    Particle.variable("roomTemp", t2);
+    
+    // Get humidity value from sensor & convert to string
+    float h = dht.getHumidity();
+    String h2 = String(h);
+    
+    // Check if humidity is not 0
+    if (t > 0)
+    {
+        Particle.publish("humidity", h2, PRIVATE);
+    }
+
+
+    // Wait 5 seconds before taking another set of readings
+    delay(5000);
+
+}
